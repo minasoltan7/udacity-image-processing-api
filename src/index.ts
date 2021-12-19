@@ -26,7 +26,7 @@ console.log(publicDirectoryPath)
 // our resize function
 const resizeImage = async (fileName: unknown, width: unknown, height: unknown) => {
   try {
-    sharp(`images/${fileName}.jpg`)
+    await sharp(`images/${fileName}.jpg`)
       .resize(width as number, height as number)
       .toFile(`output/new${fileName}-${width}-${height}.jpg`)
   } catch (err) {
@@ -50,21 +50,28 @@ const imageAlreadyResized = (imagePath: unknown, width: unknown, height: unknown
   }
   return false
 }
+
+// async function waiting for resizing to happen then send the new image to the front -end
+
 // our image endpoint for resizing
 app.get('/image', (req: Request, res: Response) => {
   const width = parseInt(req.query.width as string)
   const height = parseInt(req.query.height as string)
   const fileName = req.query.file_name?.toLocaleString()
   if (imageExist(fileName) === true && imageAlreadyResized(fileName, width, height) === false) {
-    resizeImage(fileName, width, height)
     // res.send('image is processed')
-    setTimeout(() => {
-      res.sendFile(`${publicDirectoryPath}/output/new${fileName}-${width}-${height}.jpg`)
-    }, 6000)
+
+    resizeImage(fileName, width, height)
+      .then(() => {
+        res.sendFile(`${publicDirectoryPath}/output/new${fileName}-${width}-${height}.jpg`)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   } else if (imageAlreadyResized(fileName, width, height)) {
     res.sendFile(`${publicDirectoryPath}/output/new${fileName}-${width}-${height}.jpg`)
   } else if (imageExist(fileName) === false) {
-    res.send('file doesnt exist ya basha')
+    res.send('file doesnt exist in images directory')
   }
 })
 
