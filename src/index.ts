@@ -6,44 +6,66 @@ import sharp from 'sharp'
 import fs from 'fs'
 
 dotenv.config()
-
 const PORT = process.env.PORT || 3000
 // create an instance server
 const app: Application = express()
 // HTTP request logger middleware
-// app.use(morgan('short'))
-
+app.use(morgan('short'))
 // add routing for / path
+
 app.get('/', (req: Request, res: Response) => {
   res.send('our app is working')
 })
 
+const path = require('path')
+
+const publicDirectoryPath = path.join(__dirname, '../')
+app.use(express.static(publicDirectoryPath))
+
+console.log(publicDirectoryPath)
 // our resize function
 const resizeImage = async (fileName: unknown, width: unknown, height: unknown) => {
   try {
     sharp(`images/${fileName}.jpg`)
       .resize(width as number, height as number)
-      .toFile(`output/new${fileName}.jpg`)
+      .toFile(`output/new${fileName}-${width}-${height}.jpg`)
   } catch (err) {
     console.log(err)
   }
 }
 
-// Check if the file exists in the current directory.
-const file = 'images/fjord.jpg';
+// Check if the file exists in the imaages directory.
 
-fs.access(file, fs.constants.F_OK, (err) => {
-  console.log(`${file} ${err ? 'does not exist' : 'exists'}`)
-})
+const imageExist = (imagePath: unknown): boolean => {
+  if (fs.existsSync(`images/${imagePath}.jpg` as string)) {
+    return true
+  }
+  return false
+}
+// check if image has already been resized before
 
-
-// our image endpoint for resizing 
+const imageAlreadyResized = (imagePath: unknown, width: unknown, height: unknown): boolean => {
+  if (fs.existsSync(`output/new${imagePath}-${width}-${height}.jpg` as string)) {
+    return true
+  }
+  return false
+}
+// our image endpoint for resizing
 app.get('/image', (req: Request, res: Response) => {
   const width = parseInt(req.query.width as string)
   const height = parseInt(req.query.height as string)
   const fileName = req.query.file_name?.toLocaleString()
-  resizeImage(fileName, width, height)
-  res.send('image is processed')
+  if (imageExist(fileName) === true && imageAlreadyResized(fileName, width, height) === false) {
+    resizeImage(fileName, width, height)
+    // res.send('image is processed')
+    setTimeout(() => {
+      res.sendFile(`${publicDirectoryPath}/output/new${fileName}-${width}-${height}.jpg`)
+    }, 6000)
+  } else if (imageAlreadyResized(fileName, width, height)) {
+    res.sendFile(`${publicDirectoryPath}/output/new${fileName}-${width}-${height}.jpg`)
+  } else if (imageExist(fileName) === false) {
+    res.send('file doesnt exist ya basha')
+  }
 })
 
 // start express server
