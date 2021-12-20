@@ -5,8 +5,13 @@ import app from '../index'
 const request = supertest(app)
 
 describe('Test endpoint response', () => {
-  it('test hello world endpoint', async () => {
+  it('Testing our main route endpoint', async () => {
     const response = await request.get('/')
+    expect(response.status).toBe(200)
+  })
+
+  it('Testing our resize endpoint', async () => {
+    const response = await request.get('/resize')
     expect(response.status).toBe(200)
   })
 })
