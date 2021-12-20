@@ -1,4 +1,3 @@
-
 import express, { Application, Request, Response } from 'express'
 import morgan from 'morgan'
 import * as dotenv from 'dotenv'
@@ -17,9 +16,9 @@ app.get('/', (req: Request, res: Response) => {
   res.send('our app is working')
 })
 
+// identifying our public directly to reach "output" directory when using .sendFile()
 const path = require('path')
 
-// identifying our public directly to reach "output" directory when using .sendFile()
 const publicDirectoryPath = path.join(__dirname, '../')
 app.use(express.static(publicDirectoryPath))
 
