@@ -1,4 +1,4 @@
-/* eslint-disable radix */
+
 import express, { Application, Request, Response } from 'express'
 import morgan from 'morgan'
 import * as dotenv from 'dotenv'
@@ -19,6 +19,7 @@ app.get('/', (req: Request, res: Response) => {
 
 const path = require('path')
 
+// identifying our public directly to reach "output" directory when using .sendFile()
 const publicDirectoryPath = path.join(__dirname, '../')
 app.use(express.static(publicDirectoryPath))
 
@@ -34,7 +35,7 @@ const resizeImage = async (fileName: unknown, width: unknown, height: unknown) =
   }
 }
 
-// Check if the file exists in the imaages directory.
+// Check if the file exists in the "images" directory.
 
 const imageExist = (imagePath: unknown): boolean => {
   if (fs.existsSync(`images/${imagePath}.jpg` as string)) {
@@ -51,16 +52,18 @@ const imageAlreadyResized = (imagePath: unknown, width: unknown, height: unknown
   return false
 }
 
-// async function waiting for resizing to happen then send the new image to the front -end
-
 // our image endpoint for resizing
+// eslint-disable-next-line consistent-return
 app.get('/image', (req: Request, res: Response) => {
-  const width = parseInt(req.query.width as string)
-  const height = parseInt(req.query.height as string)
+  const width = parseInt(req.query.width as string, 10)
+  const height = parseInt(req.query.height as string, 10)
   const fileName = req.query.file_name?.toLocaleString()
+  // validating if height and width comming from the user are positive integers
+  if (width <= 0 || height <= 0) {
+    return res.send('Please use positive integers for width and height')
+  }
+  // Checking if image exist in our "images" directory and isnt alredy cached in "output" directory
   if (imageExist(fileName) === true && imageAlreadyResized(fileName, width, height) === false) {
-    // res.send('image is processed')
-
     resizeImage(fileName, width, height)
       .then(() => {
         res.sendFile(`${publicDirectoryPath}/output/new${fileName}-${width}-${height}.jpg`)
@@ -68,8 +71,10 @@ app.get('/image', (req: Request, res: Response) => {
       .catch((err) => {
         console.log(err)
       })
+    // If image is cached in our "outout" directory, send already processed image found in the "output" directory
   } else if (imageAlreadyResized(fileName, width, height)) {
     res.sendFile(`${publicDirectoryPath}/output/new${fileName}-${width}-${height}.jpg`)
+    // if image isnt available in our "images" directory notify the user
   } else if (imageExist(fileName) === false) {
     res.send('file doesnt exist in images directory')
   }
