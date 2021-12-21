@@ -10,6 +10,15 @@ const imageExist = (imagePath: unknown): boolean => {
   return false
 }
 
+// check if image has already been resized before
+
+const imageAlreadyResized = (imagePath: unknown, width: unknown, height: unknown): boolean => {
+  if (fs.existsSync(`output/new${imagePath}-${width}-${height}.jpg` as string)) {
+    return true
+  }
+  return false
+}
+
 // our resize function
 const resizeImage = async (fileName: unknown, width: unknown, height: unknown) => {
   try {
@@ -19,15 +28,6 @@ const resizeImage = async (fileName: unknown, width: unknown, height: unknown) =
   } catch (err) {
     console.log(err)
   }
-}
-
-// check if image has already been resized before
-
-const imageAlreadyResized = (imagePath: unknown, width: unknown, height: unknown): boolean => {
-  if (fs.existsSync(`output/new${imagePath}-${width}-${height}.jpg` as string)) {
-    return true
-  }
-  return false
 }
 
 export default { imageExist, imageAlreadyResized, resizeImage }

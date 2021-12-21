@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "npx tsc && jasmine",
-    "start:dev": "nodemon --watch './**/*.ts' --exec 'ts-node' ./src/index.ts",
+    "start-dev": "nodemon --watch './**/*.ts' --exec 'ts-node' ./src/index.ts",
     "clean": "rimraf build/",
     "build": "yarn clean && npx tsc",
-    "start:prod": "npm run build && nodemon build/index.js",
+    "start-prod": "npm run build && nodemon build/index.js",
     "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx}'",
     "lint": "eslint . --ext .ts"
   },

@@ -15,6 +15,13 @@ resize.get('/', (req, res) => {
   const width = parseInt(req.query.width as string, 10)
   const height = parseInt(req.query.height as string, 10)
   const fileName = req.query.file_name?.toLocaleString()
+
+  // Checking if user entered the right url
+  if (!fileName) {
+    return res.send(
+      'Please enter the URL of the image you want to resize in the following format : http://localhost:3000/resize?file_name={fileName}&width={width}&height={heigth}'
+    )
+  }
   // validating if height and width comming from the user are positive integers
   if (width <= 0 || height <= 0) {
     return res.send('Please use positive integers for width and height')
@@ -33,7 +40,7 @@ resize.get('/', (req, res) => {
     res.sendFile(`${publicDirectoryPath}/output/new${fileName}-${width}-${height}.jpg`)
     // if image isnt available in our "images" directory notify the user
   } else if (imageExist(fileName) === false) {
-    res.send('file doesnt exist in images directory')
+    res.send('File doesnt exist in images directory')
   }
 })
 
