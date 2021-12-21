@@ -11,7 +11,7 @@ const publicDirectoryPath = path.join(__dirname, '../../../')
 const { imageExist, imageAlreadyResized, resizeImage } = resizeFunctions
 // our image endpoint for resizing
 // eslint-disable-next-line consistent-return
-resize.get('/', (req, res) => {
+resize.get('/', (req: express.Request, res: express.Response) => {
   const width = parseInt(req.query.width as string, 10)
   const height = parseInt(req.query.height as string, 10)
   const fileName = req.query.file_name?.toLocaleString()
@@ -22,8 +22,10 @@ resize.get('/', (req, res) => {
       'Please enter the URL of the image you want to resize in the following format : http://localhost:3000/resize?file_name={fileName}&width={width}&height={heigth}'
     )
   }
+
   // validating if height and width comming from the user are positive integers
-  if (width <= 0 || height <= 0) {
+  if (Number.isNaN(width) || width <= 0 || Number.isNaN(height) || height <= 0) {
+    console.log(!Number.isNaN(width))
     return res.send('Please use positive integers for width and height')
   }
   // Checking if image exist in our "images" directory and isnt alredy cached in "output" directory
