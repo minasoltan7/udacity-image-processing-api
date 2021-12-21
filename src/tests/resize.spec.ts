@@ -1,4 +1,4 @@
-import functions from '../utilites/resizeFunctions'
+import functions from '../utilities/resizeFunctions'
 
 const { imageExist } = functions
 
