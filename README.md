@@ -41,4 +41,4 @@ The technologies used in this project are:
 
 Credit goes to:-
 
-- Udacity advanced front-end web development track
+- Udacity Advanced Fullstack Web Development track
